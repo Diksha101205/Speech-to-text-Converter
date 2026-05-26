@@ -10,7 +10,6 @@ dist-ssr/
 # Environment and local files
 .env
 .env.*
-!.env.example
 *.local
 
 # Uploaded audio
