@@ -1,0 +1,30 @@
+{
+  "name": "speech-to-text-converter",
+  "version": "1.0.0",
+  "description": "MERN speech-to-text web project with audio upload, recording, transcription, and MongoDB storage.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "client": "npm run dev --prefix converter",
+    "server": "node server/index.js",
+    "server:dev": "node --watch server/index.js",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
+    "build": "npm run build --prefix converter",
+    "lint": "npm run lint --prefix converter",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2",
+    "multer": "^2.1.1",
+    "openai": "^6.39.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.1"
+  }
+}
