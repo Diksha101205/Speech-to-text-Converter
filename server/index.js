@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
@@ -5,7 +7,7 @@ import express from 'express'
 import { connectDatabase } from './config/db.js'
 import transcriptionRoutes from './routes/transcriptions.js'
 
-dotenv.config()
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
 const app = express()
 const port = process.env.PORT || 5000

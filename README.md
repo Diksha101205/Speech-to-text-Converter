@@ -57,6 +57,8 @@ OPENAI_TRANSCRIPTION_MODEL=gpt-4o-mini-transcribe
 OPENAI_TRANSCRIPTION_PROMPT=
 ```
 
+The server loads the real `.env` file at runtime. `.env.example` is only a safe template for variable names and should not contain private keys.
+
 ## Project Days
 
 - **Day 1:** MERN overview, API selection, Vite React setup, Tailwind setup, Git setup.
