@@ -40,6 +40,28 @@ const upload = multer({
   },
 })
 
+router.get('/', async (_req, res, next) => {
+  try {
+    if (!isDatabaseConnected()) {
+      return res.json({
+        saved: false,
+        transcriptions: [],
+      })
+    }
+
+    const transcriptions = await Transcription.find()
+      .sort({ createdAt: -1 })
+      .limit(12)
+
+    return res.json({
+      saved: true,
+      transcriptions,
+    })
+  } catch (error) {
+    return next(error)
+  }
+})
+
 router.post('/', upload.single('audio'), async (req, res, next) => {
   if (!req.file) {
     return res.status(400).json({ message: 'Audio file is required.' })

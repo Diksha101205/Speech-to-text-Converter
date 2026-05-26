@@ -97,3 +97,15 @@ OpenAI Speech-to-Text is implemented in `server/services/speechToText.js` with t
 5. Returns the transcript to the frontend.
 
 The file upload limit is 25 MB to match the OpenAI transcription file limit.
+
+## Day 5: Frontend UI
+
+The React frontend in `converter/src/App.jsx` now includes:
+
+- Audio file upload.
+- Browser audio recording with `MediaRecorder`.
+- Submit flow that sends `FormData` to the Express API.
+- Transcription result list with copy and remove actions.
+- Saved transcription history when MongoDB is connected.
+
+Tailwind CSS is used for the page layout, controls, status messages, and responsive styling.
