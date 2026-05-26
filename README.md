@@ -54,6 +54,7 @@ CLIENT_URL=http://localhost:5173
 MONGODB_URI=mongodb://127.0.0.1:27017/speech_to_text_converter
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_TRANSCRIPTION_MODEL=gpt-4o-mini-transcribe
+OPENAI_TRANSCRIPTION_PROMPT=
 ```
 
 ## Project Days
@@ -83,4 +84,16 @@ MongoDB is connected with Mongoose in `server/config/db.js`. The `Transcription`
 - Provider name, status, transcript text, and error details.
 - Automatic `createdAt` and `updatedAt` timestamps.
 
-If `MONGODB_URI` is missing or MongoDB is not running, the backend still accepts uploads and returns `saved: false` so the frontend can show a helpful message.
+If `MONGODB_URI` is missing or MongoDB is not running, the backend can still process transcription requests and returns `saved: false` after a successful provider response.
+
+## Day 4: Speech-to-Text Integration
+
+OpenAI Speech-to-Text is implemented in `server/services/speechToText.js` with the official `openai` Node SDK. The upload route now:
+
+1. Receives an audio file through Multer.
+2. Saves upload metadata in MongoDB when connected.
+3. Sends the stored file to OpenAI's transcription endpoint.
+4. Updates the MongoDB record with the transcript, model, provider, and status.
+5. Returns the transcript to the frontend.
+
+The file upload limit is 25 MB to match the OpenAI transcription file limit.

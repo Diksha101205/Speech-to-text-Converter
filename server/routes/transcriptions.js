@@ -6,6 +6,7 @@ import multer from 'multer'
 
 import { isDatabaseConnected } from '../config/db.js'
 import Transcription from '../models/Transcription.js'
+import { transcribeAudio } from '../services/speechToText.js'
 
 const router = Router()
 const uploadDir = path.resolve('server/uploads')
@@ -58,15 +59,39 @@ router.post('/', upload.single('audio'), async (req, res, next) => {
       ? await Transcription.create(uploadDetails)
       : null
 
+    const result = await transcribeAudio(req.file.path)
+
+    if (savedTranscription) {
+      savedTranscription.provider = result.provider
+      savedTranscription.model = result.model
+      savedTranscription.status = 'transcribed'
+      savedTranscription.transcript = result.text
+      savedTranscription.error = ''
+      await savedTranscription.save()
+    }
+
     return res.status(201).json({
       message: savedTranscription
-        ? 'Audio uploaded and saved successfully.'
-        : 'Audio uploaded successfully. Add MONGODB_URI to save it in MongoDB.',
+        ? 'Audio uploaded, transcribed, and saved successfully.'
+        : 'Audio uploaded and transcribed successfully. Add MONGODB_URI to save it in MongoDB.',
       saved: Boolean(savedTranscription),
       transcription: savedTranscription,
+      transcript: result.text,
+      provider: result.provider,
+      model: result.model,
       file: uploadDetails,
     })
   } catch (error) {
+    if (isDatabaseConnected()) {
+      await Transcription.findOneAndUpdate(
+        { fileName: uploadDetails.fileName },
+        {
+          status: 'failed',
+          error: error.message,
+        },
+      )
+    }
+
     return next(error)
   }
 })

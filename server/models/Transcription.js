@@ -34,6 +34,10 @@ const transcriptionSchema = new mongoose.Schema(
       type: String,
       default: 'openai',
     },
+    model: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
       enum: ['uploaded', 'transcribed', 'failed'],
