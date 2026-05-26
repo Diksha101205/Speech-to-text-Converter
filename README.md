@@ -63,3 +63,12 @@ OPENAI_TRANSCRIPTION_MODEL=gpt-4o-mini-transcribe
 - **Day 3:** MongoDB connection, Mongoose schema for audio uploads and transcriptions.
 - **Day 4:** OpenAI Speech-to-Text integration.
 - **Day 5:** React UI for audio upload, browser recording, and transcription display.
+
+## Day 2: Backend Setup
+
+The backend runs on Express and exposes:
+
+- `GET /api/health` for a simple server check.
+- `POST /api/transcriptions` for uploading one audio file with the form field name `audio`.
+
+Multer stores uploaded audio in `server/uploads`. The upload folder is ignored by Git except for a `.gitkeep` placeholder.
