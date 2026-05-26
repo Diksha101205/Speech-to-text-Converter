@@ -72,3 +72,15 @@ The backend runs on Express and exposes:
 - `POST /api/transcriptions` for uploading one audio file with the form field name `audio`.
 
 Multer stores uploaded audio in `server/uploads`. The upload folder is ignored by Git except for a `.gitkeep` placeholder.
+
+## Day 3: Database Setup
+
+MongoDB is connected with Mongoose in `server/config/db.js`. The `Transcription` model stores:
+
+- Original audio filename and stored filename.
+- MIME type, file size, and local storage path.
+- Source type: uploaded file or browser recording.
+- Provider name, status, transcript text, and error details.
+- Automatic `createdAt` and `updatedAt` timestamps.
+
+If `MONGODB_URI` is missing or MongoDB is not running, the backend still accepts uploads and returns `saved: false` so the frontend can show a helpful message.

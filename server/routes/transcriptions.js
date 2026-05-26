@@ -4,6 +4,9 @@ import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
 
+import { isDatabaseConnected } from '../config/db.js'
+import Transcription from '../models/Transcription.js'
+
 const router = Router()
 const uploadDir = path.resolve('server/uploads')
 
@@ -36,22 +39,36 @@ const upload = multer({
   },
 })
 
-router.post('/', upload.single('audio'), (req, res) => {
+router.post('/', upload.single('audio'), async (req, res, next) => {
   if (!req.file) {
     return res.status(400).json({ message: 'Audio file is required.' })
   }
 
-  return res.status(201).json({
-    message: 'Audio uploaded successfully.',
-    file: {
-      originalName: req.file.originalname,
-      fileName: req.file.filename,
-      mimeType: req.file.mimetype,
-      size: req.file.size,
-      path: req.file.path,
-      source: req.body.source || 'upload',
-    },
-  })
+  const uploadDetails = {
+    originalName: req.file.originalname,
+    fileName: req.file.filename,
+    mimeType: req.file.mimetype,
+    size: req.file.size,
+    storagePath: req.file.path,
+    source: req.body.source === 'recording' ? 'recording' : 'upload',
+  }
+
+  try {
+    const savedTranscription = isDatabaseConnected()
+      ? await Transcription.create(uploadDetails)
+      : null
+
+    return res.status(201).json({
+      message: savedTranscription
+        ? 'Audio uploaded and saved successfully.'
+        : 'Audio uploaded successfully. Add MONGODB_URI to save it in MongoDB.',
+      saved: Boolean(savedTranscription),
+      transcription: savedTranscription,
+      file: uploadDetails,
+    })
+  } catch (error) {
+    return next(error)
+  }
 })
 
 export default router

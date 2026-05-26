@@ -2,6 +2,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 
+import { connectDatabase } from './config/db.js'
 import transcriptionRoutes from './routes/transcriptions.js'
 
 dotenv.config()
@@ -33,6 +34,8 @@ app.use((err, _req, res, _next) => {
     message: err.message || 'Something went wrong while processing the request.',
   })
 })
+
+await connectDatabase()
 
 app.listen(port, () => {
   console.log(`Speech-to-text server running on http://localhost:${port}`)
