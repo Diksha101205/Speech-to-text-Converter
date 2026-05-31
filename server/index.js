@@ -28,7 +28,10 @@ app.use((error, _req, res, _next) => {
   const status = error.status || 500
 
   res.status(status).json({
-    message: error.message || 'Something went wrong.',
+    message:
+      status >= 500
+        ? 'The server could not complete the request. Please try again.'
+        : error.message || 'Something went wrong.',
   })
 })
 

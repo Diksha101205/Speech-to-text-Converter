@@ -70,6 +70,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 6:** Frontend-to-backend connection, loading states, and transcript rendering.
 - **Day 7:** MongoDB persistence for completed transcriptions and saved history display.
 - **Day 8:** Tailwind UI refinement with improved typography, buttons, animation, and history cards.
+- **Day 9:** Error handling and validation for uploads, recordings, API failures, and history loading.
 
 ## Day 2: Backend Setup
 
@@ -162,3 +163,14 @@ The frontend now has a more polished Tailwind interface:
 - Hover lift, shadow transitions, and card entry animation for a smoother feel.
 - Rounded upload, recorder, selected audio, status, and empty-state panels.
 - Saved transcription history displayed as individual card-style entries with copy and remove actions.
+
+## Day 9: Error Handling & Validation
+
+The app now handles common failure cases with clear messages:
+
+- Frontend validates audio file type and the 25 MB size limit before upload.
+- Empty browser recordings are rejected before submission.
+- Backend validates the uploaded file field, MIME type, empty files, and upload size.
+- Multer upload errors return readable JSON messages instead of generic failures.
+- API and network failures show actionable frontend messages.
+- Saved history load failures and clipboard copy failures are handled without crashing the UI.

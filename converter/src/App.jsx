@@ -16,6 +16,7 @@ import {
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+const AUDIO_EXTENSIONS = ['.mp3', '.mp4', '.m4a', '.wav', '.webm', '.ogg', '.aac', '.flac']
 
 const formatBytes = (bytes = 0) => {
   if (!bytes) return '0 KB'
@@ -44,6 +45,22 @@ const createLocalId = () => {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+const isAudioFile = (file) => {
+  if (file.type?.startsWith('audio/')) return true
+
+  return AUDIO_EXTENSIONS.some((extension) => file.name.toLowerCase().endsWith(extension))
+}
+
+const getApiErrorMessage = (response, data) => {
+  if (data?.message) return data.message
+
+  if (response.status === 400) return 'Please check the audio file and try again.'
+  if (response.status === 413) return 'Audio must be 25 MB or smaller.'
+  if (response.status >= 500) return 'The transcription service is unavailable right now. Please try again.'
+
+  return 'Transcription failed. Please try again.'
+}
+
 function App() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [recordedFile, setRecordedFile] = useState(null)
@@ -70,10 +87,12 @@ function App() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/transcriptions`)
+      const data = await response.json().catch(() => ({}))
 
-      if (!response.ok) return
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(response, data))
+      }
 
-      const data = await response.json()
       const savedItems = (data.transcriptions || []).map((item) => ({
         id: item._id,
         text: item.transcript,
@@ -92,7 +111,7 @@ function App() {
       }
     } catch {
       if (!silent) {
-        setNotice('Backend history is unavailable right now.')
+        setError('Saved history could not be loaded. Check that the backend is running.')
       }
     } finally {
       setIsHistoryLoading(false)
@@ -148,8 +167,8 @@ function App() {
 
     if (!file) return
 
-    if (!file.type.startsWith('audio/')) {
-      setError('Please choose an audio file.')
+    if (!isAudioFile(file)) {
+      setError('Please choose a valid audio file: MP3, MP4, M4A, WAV, WEBM, OGG, AAC, or FLAC.')
       clearSelection()
       return
     }
@@ -194,6 +213,14 @@ function App() {
         const blob = new Blob(chunksRef.current, {
           type: recorder.mimeType || 'audio/webm',
         })
+
+        if (blob.size === 0) {
+          stream.getTracks().forEach((track) => track.stop())
+          streamRef.current = null
+          setError('No audio was captured. Please record again.')
+          return
+        }
+
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
         const file = new File([blob], `recording-${timestamp}.webm`, {
           type: blob.type || 'audio/webm',
@@ -246,7 +273,7 @@ function App() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(data.message || 'Transcription failed.')
+        throw new Error(getApiErrorMessage(response, data))
       }
 
       const item = {
@@ -264,15 +291,23 @@ function App() {
       setNotice(data.saved ? 'Transcription saved to MongoDB.' : 'Transcription complete.')
       clearSelection()
     } catch (submitError) {
-      setError(submitError.message)
+      setError(
+        submitError instanceof TypeError
+          ? 'Cannot reach the backend. Make sure the server is running and try again.'
+          : submitError.message,
+      )
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const copyTranscript = async (text) => {
-    await navigator.clipboard.writeText(text)
-    setNotice('Copied.')
+    try {
+      await navigator.clipboard.writeText(text)
+      setNotice('Copied.')
+    } catch {
+      setError('Could not copy the transcription. Please copy it manually.')
+    }
   }
 
   const removeTranscript = (id) => {

@@ -10,6 +10,7 @@ import { transcribeAudio } from '../services/speechToText.js'
 
 const router = Router()
 const uploadDir = path.resolve('server/uploads')
+const MAX_AUDIO_SIZE = 25 * 1024 * 1024
 
 fs.mkdirSync(uploadDir, { recursive: true })
 
@@ -26,7 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 25 * 1024 * 1024,
+    fileSize: MAX_AUDIO_SIZE,
   },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype?.startsWith('audio/')) {
@@ -40,11 +41,30 @@ const upload = multer({
   },
 })
 
+const handleAudioUpload = (req, res, next) => {
+  upload.single('audio')(req, res, (error) => {
+    if (!error) {
+      return next()
+    }
+
+    if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        message: 'Audio must be 25 MB or smaller.',
+      })
+    }
+
+    return res.status(error.status || 400).json({
+      message: error.message || 'Audio upload failed.',
+    })
+  })
+}
+
 router.get('/', async (_req, res, next) => {
   try {
     if (!isDatabaseConnected()) {
       return res.json({
         saved: false,
+        count: 0,
         transcriptions: [],
       })
     }
@@ -66,9 +86,13 @@ router.get('/', async (_req, res, next) => {
   }
 })
 
-router.post('/', upload.single('audio'), async (req, res, next) => {
+router.post('/', handleAudioUpload, async (req, res, next) => {
   if (!req.file) {
     return res.status(400).json({ message: 'Audio file is required.' })
+  }
+
+  if (req.file.size === 0) {
+    return res.status(400).json({ message: 'Audio file is empty. Please choose or record audio again.' })
   }
 
   const uploadDetails = {
