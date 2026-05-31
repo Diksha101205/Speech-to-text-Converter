@@ -9,11 +9,14 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+const clientOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 
 app.use(
   cors({
-    origin: [CLIENT_URL, 'http://localhost:3000'].filter(Boolean),
+    origin: [...new Set([...clientOrigins, 'http://localhost:5173', 'http://localhost:3000'])],
   }),
 )
 app.use(express.json())

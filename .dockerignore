@@ -1,0 +1,12 @@
+node_modules
+converter/node_modules
+converter/dist
+.venv
+.git
+.env
+.env.*
+logs
+server/uploads/*
+!server/uploads/.gitkeep
+server/scripts/__pycache__
+*.pyc

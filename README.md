@@ -72,6 +72,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 8:** Tailwind UI refinement with improved typography, buttons, animation, and history cards.
 - **Day 9:** Error handling and validation for uploads, recordings, API failures, and history loading.
 - **Day 10:** Browser user sessions for saving and retrieving each user's transcription history.
+- **Day 11:** Backend deployment configuration for Render with MongoDB Atlas access.
 
 ## Day 2: Backend Setup
 
@@ -187,3 +188,37 @@ The app uses browser-based user sessions so each user can save and retrieve thei
 - The UI shows the current session and includes a New Session action for starting a separate history.
 
 Supabase Auth can be added later if a hosted Supabase project URL and anon key are available. The current implementation keeps Day 10 functional with the existing MongoDB backend.
+
+## Day 11: Deploying the Backend
+
+The backend is ready for Render deployment with Docker:
+
+- `Dockerfile` installs Node.js dependencies and the Python Whisper runtime.
+- `requirements.txt` lists the Python transcription dependencies.
+- `render.yaml` defines a Render web service with `/api/health` as the health check.
+- `CLIENT_URLS` supports one or more comma-separated frontend origins for CORS.
+- `MONGODB_URI` must point to a hosted database such as MongoDB Atlas, not local `127.0.0.1`.
+
+Set these Render environment variables:
+
+```bash
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
+CLIENT_URLS=https://your-frontend-url.vercel.app,http://localhost:5173
+WHISPER_MODEL=tiny
+WHISPER_PYTHON_PATH=/opt/venv/bin/python
+```
+
+Render deployment steps:
+
+1. Push the repository to GitHub.
+2. In Render, create a new Blueprint or Web Service from this repository.
+3. Use the Docker runtime from `render.yaml`.
+4. Add `MONGODB_URI` and `CLIENT_URLS` as environment variables.
+5. Choose a plan with enough memory for Whisper transcription.
+6. Deploy and verify `https://your-render-service.onrender.com/api/health`.
+
+Database access requirement:
+
+- Use MongoDB Atlas or another hosted MongoDB instance.
+- Add Render's outbound IPs to the database allowlist, or allow access from anywhere for development.
+- Keep the database username and password only in Render environment variables.

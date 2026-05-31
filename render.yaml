@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: speech-to-text-converter-api
+    runtime: docker
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: WHISPER_MODEL
+        value: tiny
+      - key: WHISPER_PYTHON_PATH
+        value: /opt/venv/bin/python
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URLS
+        sync: false
