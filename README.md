@@ -68,6 +68,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 4:** Local Whisper Speech-to-Text integration.
 - **Day 5:** React UI for audio upload, browser recording, and transcription display.
 - **Day 6:** Frontend-to-backend connection, loading states, and transcript rendering.
+- **Day 7:** MongoDB persistence for completed transcriptions and saved history display.
 
 ## Day 2: Backend Setup
 
@@ -138,3 +139,15 @@ The frontend sends audio to the Express backend from `converter/src/App.jsx` usi
 3. While Whisper is generating the transcript, the Transcribe button is disabled and shows a loading spinner with `Transcribing...`.
 4. When the backend responds, the returned transcript is displayed at the top of the transcription list.
 5. If MongoDB is connected, saved transcription history is loaded from `GET /api/transcriptions`.
+
+## Day 7: Storing Transcriptions in the Database
+
+Completed transcriptions are stored in MongoDB through the `Transcription` Mongoose model:
+
+1. `POST /api/transcriptions` creates an upload record when MongoDB is connected.
+2. After local Whisper returns text, the record is updated with the transcript, provider, model, and `transcribed` status.
+3. Failed transcription attempts are marked with `failed` status and the error message.
+4. `GET /api/transcriptions` returns the latest completed transcription records from MongoDB.
+5. The React frontend loads saved history on page load and includes a refresh button for fetching previous transcriptions again.
+
+If MongoDB is not running, uploads and transcription still work, but records are not persisted until the database is available.

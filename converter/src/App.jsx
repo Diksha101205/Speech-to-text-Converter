@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   AlertTriangle,
   AudioLines,
@@ -63,37 +63,49 @@ function App() {
   const activeFile = recordedFile || selectedFile
   const source = recordedFile ? 'recording' : 'upload'
 
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/transcriptions`)
-
-        if (!response.ok) return
-
-        const data = await response.json()
-        const savedItems = (data.transcriptions || [])
-          .filter((item) => item.transcript)
-          .map((item) => ({
-            id: item._id,
-            text: item.transcript,
-            fileName: item.originalName,
-            source: item.source,
-            saved: true,
-            provider: item.provider,
-            model: item.model,
-            createdAt: item.createdAt,
-          }))
-
-        setTranscriptions(savedItems)
-      } catch {
-        setNotice('Backend history is unavailable right now.')
-      } finally {
-        setIsHistoryLoading(false)
-      }
+  const loadHistory = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) {
+      setIsHistoryLoading(true)
     }
 
-    loadHistory()
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/transcriptions`)
+
+      if (!response.ok) return
+
+      const data = await response.json()
+      const savedItems = (data.transcriptions || []).map((item) => ({
+        id: item._id,
+        text: item.transcript,
+        fileName: item.originalName,
+        source: item.source,
+        saved: true,
+        provider: item.provider,
+        model: item.model,
+        createdAt: item.createdAt,
+      }))
+
+      setTranscriptions(savedItems)
+
+      if (!silent) {
+        setNotice(data.saved ? 'Saved history refreshed.' : 'MongoDB history is unavailable right now.')
+      }
+    } catch {
+      if (!silent) {
+        setNotice('Backend history is unavailable right now.')
+      }
+    } finally {
+      setIsHistoryLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    const historyTimer = window.setTimeout(() => {
+      loadHistory({ silent: true })
+    }, 0)
+
+    return () => window.clearTimeout(historyTimer)
+  }, [loadHistory])
 
   useEffect(() => {
     return () => {
@@ -437,7 +449,20 @@ function App() {
                   {isHistoryLoading ? 'Loading saved items...' : `${transcriptions.length} item${transcriptions.length === 1 ? '' : 's'}`}
                 </p>
               </div>
-              <AudioLines aria-hidden="true" className="text-teal-700" size={24} />
+              <button
+                aria-label="Refresh saved transcriptions"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
+                disabled={isHistoryLoading}
+                onClick={() => loadHistory()}
+                title="Refresh saved transcriptions"
+                type="button"
+              >
+                {isHistoryLoading ? (
+                  <LoaderCircle aria-hidden="true" className="animate-spin" size={18} />
+                ) : (
+                  <RefreshCcw aria-hidden="true" size={18} />
+                )}
+              </button>
             </div>
 
             {transcriptions.length > 0 ? (

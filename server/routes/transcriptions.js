@@ -49,12 +49,16 @@ router.get('/', async (_req, res, next) => {
       })
     }
 
-    const transcriptions = await Transcription.find()
+    const transcriptions = await Transcription.find({
+      status: 'transcribed',
+      transcript: { $ne: '' },
+    })
       .sort({ createdAt: -1 })
-      .limit(12)
+      .limit(25)
 
     return res.json({
       saved: true,
+      count: transcriptions.length,
       transcriptions,
     })
   } catch (error) {
