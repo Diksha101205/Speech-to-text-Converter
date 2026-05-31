@@ -73,6 +73,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 9:** Error handling and validation for uploads, recordings, API failures, and history loading.
 - **Day 10:** Browser user sessions for saving and retrieving each user's transcription history.
 - **Day 11:** Backend deployment configuration for Render with MongoDB Atlas access.
+- **Day 12:** Frontend deployment configuration for Vercel or Netlify with backend integration.
 
 ## Day 2: Backend Setup
 
@@ -222,3 +223,46 @@ Database access requirement:
 - Use MongoDB Atlas or another hosted MongoDB instance.
 - Add Render's outbound IPs to the database allowlist, or allow access from anywhere for development.
 - Keep the database username and password only in Render environment variables.
+
+## Day 12: Deploying the Frontend
+
+The React frontend is ready for Vercel or Netlify deployment:
+
+- `converter/vercel.json` configures Vercel as a Vite single-page app.
+- `netlify.toml` builds the frontend from the repository root and publishes `converter/dist`.
+- `converter/.env.example` documents the production API URL variable.
+- The frontend trims trailing slashes from `VITE_API_BASE_URL` so API calls work with either URL style.
+
+Frontend environment variable:
+
+```bash
+VITE_API_BASE_URL=https://your-render-backend.onrender.com
+```
+
+Backend environment variable that must include the frontend URL:
+
+```bash
+CLIENT_URLS=https://your-frontend.vercel.app,https://your-frontend.netlify.app,http://localhost:5173
+```
+
+Vercel deployment steps:
+
+1. Import the GitHub repository into Vercel.
+2. Set the project Root Directory to `converter`.
+3. Use the Vite framework preset.
+4. Add `VITE_API_BASE_URL` with the deployed Render backend URL.
+5. Deploy, then add the Vercel URL to Render's `CLIENT_URLS`.
+
+Netlify deployment steps:
+
+1. Import the GitHub repository into Netlify.
+2. Netlify can use `netlify.toml` from the repository root.
+3. Add `VITE_API_BASE_URL` with the deployed Render backend URL.
+4. Deploy, then add the Netlify URL to Render's `CLIENT_URLS`.
+
+Final integration check:
+
+1. Open the deployed frontend.
+2. Confirm `https://your-render-backend.onrender.com/api/health` returns `{ "ok": true }`.
+3. Upload or record audio from the deployed frontend.
+4. Confirm the transcript appears and saved history refreshes when MongoDB is connected.

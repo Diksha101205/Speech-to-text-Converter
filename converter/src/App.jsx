@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 const AUDIO_EXTENSIONS = ['.mp3', '.mp4', '.m4a', '.wav', '.webm', '.ogg', '.aac', '.flac']
 const SESSION_STORAGE_KEY = 'speech-to-text-session-id'
 
