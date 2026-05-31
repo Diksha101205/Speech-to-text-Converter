@@ -12,11 +12,13 @@ import {
   Square,
   Trash2,
   UploadCloud,
+  UserRound,
 } from 'lucide-react'
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 const AUDIO_EXTENSIONS = ['.mp3', '.mp4', '.m4a', '.wav', '.webm', '.ogg', '.aac', '.flac']
+const SESSION_STORAGE_KEY = 'speech-to-text-session-id'
 
 const formatBytes = (bytes = 0) => {
   if (!bytes) return '0 KB'
@@ -45,6 +47,17 @@ const createLocalId = () => {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+const getStoredSessionId = () => {
+  const existingSessionId = window.localStorage.getItem(SESSION_STORAGE_KEY)
+
+  if (existingSessionId) return existingSessionId
+
+  const sessionId = createLocalId()
+  window.localStorage.setItem(SESSION_STORAGE_KEY, sessionId)
+
+  return sessionId
+}
+
 const isAudioFile = (file) => {
   if (file.type?.startsWith('audio/')) return true
 
@@ -62,6 +75,7 @@ const getApiErrorMessage = (response, data) => {
 }
 
 function App() {
+  const [sessionId, setSessionId] = useState(getStoredSessionId)
   const [selectedFile, setSelectedFile] = useState(null)
   const [recordedFile, setRecordedFile] = useState(null)
   const [recordingUrl, setRecordingUrl] = useState('')
@@ -86,7 +100,11 @@ function App() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/transcriptions`)
+      const response = await fetch(`${API_BASE_URL}/api/transcriptions`, {
+        headers: {
+          'X-Session-Id': sessionId,
+        },
+      })
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
@@ -116,7 +134,7 @@ function App() {
     } finally {
       setIsHistoryLoading(false)
     }
-  }, [])
+  }, [sessionId])
 
   useEffect(() => {
     const historyTimer = window.setTimeout(() => {
@@ -264,10 +282,14 @@ function App() {
     const formData = new FormData()
     formData.append('audio', activeFile)
     formData.append('source', source)
+    formData.append('sessionId', sessionId)
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/transcriptions`, {
         method: 'POST',
+        headers: {
+          'X-Session-Id': sessionId,
+        },
         body: formData,
       })
       const data = await response.json().catch(() => ({}))
@@ -284,6 +306,7 @@ function App() {
         saved: data.saved,
         provider: data.provider,
         model: data.model,
+        sessionId: data.sessionId || sessionId,
         createdAt: data.transcription?.createdAt || new Date().toISOString(),
       }
 
@@ -314,6 +337,15 @@ function App() {
     setTranscriptions((items) => items.filter((item) => item.id !== id))
   }
 
+  const startNewSession = () => {
+    const nextSessionId = createLocalId()
+    window.localStorage.setItem(SESSION_STORAGE_KEY, nextSessionId)
+    setSessionId(nextSessionId)
+    setTranscriptions([])
+    setNotice('New session started.')
+    setError('')
+  }
+
   return (
     <main className="min-h-screen bg-paper text-slate-950">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -341,11 +373,33 @@ function App() {
               <Database aria-hidden="true" size={16} />
               MongoDB
             </span>
+            <span className="inline-flex items-center gap-2 rounded-md border border-violet-200 bg-violet-50 px-3 py-2 text-violet-800">
+              <UserRound aria-hidden="true" size={16} />
+              Session
+            </span>
           </div>
         </header>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)]">
           <div className="flex flex-col gap-5">
+            <section className="app-panel">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className="section-title">User Session</h2>
+                <UserRound aria-hidden="true" className="text-violet-700" size={22} />
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-900">Current browser session</p>
+                  <p className="break-all text-sm text-slate-500">{sessionId}</p>
+                </div>
+                <button className="secondary-button shrink-0" onClick={startNewSession} type="button">
+                  <RefreshCcw aria-hidden="true" size={18} />
+                  New Session
+                </button>
+              </div>
+            </section>
+
             <section className="app-panel">
               <div className="mb-5 flex items-center justify-between gap-3">
                 <h2 className="section-title">Audio Source</h2>

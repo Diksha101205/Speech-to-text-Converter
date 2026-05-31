@@ -11,6 +11,7 @@ import { transcribeAudio } from '../services/speechToText.js'
 const router = Router()
 const uploadDir = path.resolve('server/uploads')
 const MAX_AUDIO_SIZE = 25 * 1024 * 1024
+const SESSION_PATTERN = /^[a-zA-Z0-9._:-]{8,120}$/
 
 fs.mkdirSync(uploadDir, { recursive: true })
 
@@ -59,12 +60,22 @@ const handleAudioUpload = (req, res, next) => {
   })
 }
 
-router.get('/', async (_req, res, next) => {
+const getSessionId = (req) => {
+  const sessionId = req.get('x-session-id') || req.body?.sessionId || ''
+  const trimmedSessionId = sessionId.trim()
+
+  return SESSION_PATTERN.test(trimmedSessionId) ? trimmedSessionId : ''
+}
+
+router.get('/', async (req, res, next) => {
   try {
+    const sessionId = getSessionId(req)
+
     if (!isDatabaseConnected()) {
       return res.json({
         saved: false,
         count: 0,
+        sessionId,
         transcriptions: [],
       })
     }
@@ -72,6 +83,7 @@ router.get('/', async (_req, res, next) => {
     const transcriptions = await Transcription.find({
       status: 'transcribed',
       transcript: { $ne: '' },
+      ...(sessionId ? { sessionId } : {}),
     })
       .sort({ createdAt: -1 })
       .limit(25)
@@ -79,6 +91,7 @@ router.get('/', async (_req, res, next) => {
     return res.json({
       saved: true,
       count: transcriptions.length,
+      sessionId,
       transcriptions,
     })
   } catch (error) {
@@ -101,6 +114,7 @@ router.post('/', handleAudioUpload, async (req, res, next) => {
     mimeType: req.file.mimetype,
     size: req.file.size,
     storagePath: req.file.path,
+    sessionId: getSessionId(req),
     source: req.body.source === 'recording' ? 'recording' : 'upload',
   }
 
@@ -129,6 +143,7 @@ router.post('/', handleAudioUpload, async (req, res, next) => {
       transcript: result.text,
       provider: result.provider,
       model: result.model,
+      sessionId: uploadDetails.sessionId,
       file: uploadDetails,
     })
   } catch (error) {

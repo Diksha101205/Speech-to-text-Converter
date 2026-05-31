@@ -71,6 +71,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 7:** MongoDB persistence for completed transcriptions and saved history display.
 - **Day 8:** Tailwind UI refinement with improved typography, buttons, animation, and history cards.
 - **Day 9:** Error handling and validation for uploads, recordings, API failures, and history loading.
+- **Day 10:** Browser user sessions for saving and retrieving each user's transcription history.
 
 ## Day 2: Backend Setup
 
@@ -174,3 +175,15 @@ The app now handles common failure cases with clear messages:
 - Multer upload errors return readable JSON messages instead of generic failures.
 - API and network failures show actionable frontend messages.
 - Saved history load failures and clipboard copy failures are handled without crashing the UI.
+
+## Day 10: Authentication & User Sessions
+
+The app uses browser-based user sessions so each user can save and retrieve their own transcription history without requiring a hosted auth provider during local development:
+
+- The React app creates a session ID in `localStorage`.
+- Upload and history requests send the session ID to Express through `X-Session-Id`.
+- MongoDB stores the session ID on each transcription record.
+- `GET /api/transcriptions` filters saved history by the current session.
+- The UI shows the current session and includes a New Session action for starting a separate history.
+
+Supabase Auth can be added later if a hosted Supabase project URL and anon key are available. The current implementation keeps Day 10 functional with the existing MongoDB backend.

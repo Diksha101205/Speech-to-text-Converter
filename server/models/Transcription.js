@@ -25,6 +25,12 @@ const transcriptionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    sessionId: {
+      type: String,
+      default: '',
+      trim: true,
+      index: true,
+    },
     source: {
       type: String,
       enum: ['upload', 'recording'],
