@@ -32,7 +32,7 @@ const transcriptionSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      default: 'openai',
+      default: 'local-whisper',
     },
     model: {
       type: String,

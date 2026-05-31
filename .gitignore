@@ -1,11 +1,14 @@
 # Dependencies
 node_modules/
 converter/node_modules/
+.venv/
 
 # Build output
 dist/
 converter/dist/
 dist-ssr/
+__pycache__/
+*.pyc
 
 # Environment and local files
 .env

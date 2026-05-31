@@ -286,6 +286,10 @@ function App() {
               <CheckCircle2 aria-hidden="true" size={16} />
               React + Express
             </span>
+            <span className="inline-flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sky-800">
+              <AudioLines aria-hidden="true" size={16} />
+              Local Whisper
+            </span>
             <span className="inline-flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
               <Database aria-hidden="true" size={16} />
               MongoDB
@@ -391,7 +395,7 @@ function App() {
                       ) : (
                         <RefreshCcw aria-hidden="true" size={18} />
                       )}
-                      Transcribe
+                      {isSubmitting ? 'Transcribing...' : 'Transcribe'}
                     </button>
                     <button
                       className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-800 transition hover:border-red-300 hover:text-red-700"
