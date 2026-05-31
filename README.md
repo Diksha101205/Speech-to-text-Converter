@@ -69,6 +69,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 5:** React UI for audio upload, browser recording, and transcription display.
 - **Day 6:** Frontend-to-backend connection, loading states, and transcript rendering.
 - **Day 7:** MongoDB persistence for completed transcriptions and saved history display.
+- **Day 8:** Tailwind UI refinement with improved typography, buttons, animation, and history cards.
 
 ## Day 2: Backend Setup
 
@@ -151,3 +152,13 @@ Completed transcriptions are stored in MongoDB through the `Transcription` Mongo
 5. The React frontend loads saved history on page load and includes a refresh button for fetching previous transcriptions again.
 
 If MongoDB is not running, uploads and transcription still work, but records are not persisted until the database is available.
+
+## Day 8: Enhancing UI with Tailwind CSS
+
+The frontend now has a more polished Tailwind interface:
+
+- Stronger typography and spacing in the page header and section titles.
+- Reusable button styles for primary, secondary, dark, and icon actions.
+- Hover lift, shadow transitions, and card entry animation for a smoother feel.
+- Rounded upload, recorder, selected audio, status, and empty-state panels.
+- Saved transcription history displayed as individual card-style entries with copy and remove actions.

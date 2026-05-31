@@ -35,6 +35,36 @@ label:focus-within {
   outline-offset: 3px;
 }
 
+@layer components {
+  .app-panel {
+    @apply rounded-lg border border-slate-200 bg-white p-5 shadow-soft sm:p-6;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold leading-tight text-slate-950 sm:text-xl;
+  }
+
+  .primary-button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-teal-700 px-4 py-2 font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-teal-800 hover:shadow-md disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none;
+  }
+
+  .dark-button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2 font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-md disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none;
+  }
+
+  .secondary-button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-800 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-teal-500 hover:text-teal-700 hover:shadow-md disabled:translate-y-0 disabled:cursor-not-allowed disabled:text-slate-400 disabled:shadow-none;
+  }
+
+  .icon-button {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-teal-500 hover:text-teal-700 hover:shadow-md disabled:translate-y-0 disabled:cursor-not-allowed disabled:text-slate-400 disabled:shadow-none;
+  }
+
+  .transcript-card {
+    @apply animate-card-in rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md;
+  }
+}
+
 .wave-bar {
   width: 4px;
   height: 14px;
@@ -50,6 +80,10 @@ label:focus-within {
   opacity: 1;
 }
 
+.animate-card-in {
+  animation: card-in 0.28s ease-out both;
+}
+
 @keyframes wave-rise {
   from {
     transform: scaleY(0.45);
@@ -57,6 +91,18 @@ label:focus-within {
 
   to {
     transform: scaleY(2.6);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

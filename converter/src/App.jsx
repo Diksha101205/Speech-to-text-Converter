@@ -280,15 +280,15 @@ function App() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
+    <main className="min-h-screen bg-paper text-slate-950">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-teal-700">
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-mint">
               <AudioLines aria-hidden="true" size={18} />
               <span>Speech-to-Text Converter</span>
             </div>
-            <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
+            <h1 className="max-w-3xl text-3xl font-bold leading-tight text-ink sm:text-4xl">
               Convert speech into clean transcripts
             </h1>
           </div>
@@ -311,15 +311,15 @@ function App() {
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)]">
           <div className="flex flex-col gap-5">
-            <section className="border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+            <section className="app-panel">
               <div className="mb-5 flex items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold text-slate-950">Audio Source</h2>
+                <h2 className="section-title">Audio Source</h2>
                 <FileAudio aria-hidden="true" className="text-teal-700" size={22} />
               </div>
 
               <label
                 htmlFor="audio-upload"
-                className="flex cursor-pointer flex-col items-center justify-center gap-3 border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-teal-400 hover:bg-teal-50"
+                className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition duration-200 hover:-translate-y-0.5 hover:border-teal-400 hover:bg-teal-50 hover:shadow-sm"
               >
                 <UploadCloud aria-hidden="true" className="text-teal-700" size={34} />
                 <span className="text-base font-semibold text-slate-900">Choose audio</span>
@@ -335,13 +335,13 @@ function App() {
               />
             </section>
 
-            <section className="border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+            <section className="app-panel">
               <div className="mb-5 flex items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold text-slate-950">Recorder</h2>
+                <h2 className="section-title">Recorder</h2>
                 <Mic aria-hidden="true" className="text-amber-700" size={22} />
               </div>
 
-              <div className="mb-5 flex h-20 items-center justify-center gap-1 border border-slate-200 bg-slate-950 px-4">
+              <div className="mb-5 flex h-20 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-slate-950 px-4 shadow-inner">
                 {Array.from({ length: 28 }).map((_, index) => (
                   <span
                     className={`wave-bar ${isRecording ? 'is-live' : ''}`}
@@ -353,7 +353,7 @@ function App() {
 
               <div className="flex flex-wrap gap-3">
                 <button
-                  className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-teal-700 px-4 py-2 font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="primary-button"
                   disabled={isRecording || isSubmitting}
                   onClick={startRecording}
                   type="button"
@@ -362,7 +362,7 @@ function App() {
                   Record
                 </button>
                 <button
-                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-800 transition hover:border-amber-500 hover:text-amber-800 disabled:cursor-not-allowed disabled:text-slate-400"
+                  className="secondary-button hover:border-amber-500 hover:text-amber-800"
                   disabled={!isRecording}
                   onClick={stopRecording}
                   type="button"
@@ -373,9 +373,9 @@ function App() {
               </div>
             </section>
 
-            <section className="border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+            <section className="app-panel">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold text-slate-950">Selected Audio</h2>
+                <h2 className="section-title">Selected Audio</h2>
                 {activeFile ? (
                   <span className="rounded-md bg-slate-100 px-2 py-1 text-sm text-slate-600">
                     {source}
@@ -385,7 +385,7 @@ function App() {
 
               {activeFile ? (
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3 border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
                     <FileAudio aria-hidden="true" className="mt-1 shrink-0 text-teal-700" size={22} />
                     <div className="min-w-0 flex-1">
                       <p className="break-words font-semibold text-slate-900">{activeFile.name}</p>
@@ -397,7 +397,7 @@ function App() {
 
                   <div className="flex flex-wrap gap-3">
                     <button
-                      className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="dark-button"
                       disabled={isSubmitting}
                       onClick={submitAudio}
                       type="button"
@@ -410,7 +410,7 @@ function App() {
                       {isSubmitting ? 'Transcribing...' : 'Transcribe'}
                     </button>
                     <button
-                      className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-800 transition hover:border-red-300 hover:text-red-700"
+                      className="secondary-button hover:border-red-300 hover:text-red-700"
                       onClick={clearSelection}
                       type="button"
                     >
@@ -420,20 +420,20 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <p className="border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
                   No audio selected.
                 </p>
               )}
 
               {notice ? (
-                <p className="mt-4 flex items-start gap-2 border border-teal-200 bg-teal-50 p-3 text-sm text-teal-800">
+                <p className="mt-4 flex animate-card-in items-start gap-2 rounded-lg border border-teal-200 bg-teal-50 p-3 text-sm text-teal-800">
                   <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0" size={16} />
                   <span>{notice}</span>
                 </p>
               ) : null}
 
               {error ? (
-                <p className="mt-4 flex items-start gap-2 border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <p className="mt-4 flex animate-card-in items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   <AlertTriangle aria-hidden="true" className="mt-0.5 shrink-0" size={16} />
                   <span>{error}</span>
                 </p>
@@ -441,17 +441,17 @@ function App() {
             </section>
           </div>
 
-          <section className="border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+          <section className="app-panel">
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-slate-950">Transcriptions</h2>
+                <h2 className="section-title">Transcriptions</h2>
                 <p className="text-sm text-slate-500">
                   {isHistoryLoading ? 'Loading saved items...' : `${transcriptions.length} item${transcriptions.length === 1 ? '' : 's'}`}
                 </p>
               </div>
               <button
                 aria-label="Refresh saved transcriptions"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
+                className="icon-button"
                 disabled={isHistoryLoading}
                 onClick={() => loadHistory()}
                 title="Refresh saved transcriptions"
@@ -468,10 +468,10 @@ function App() {
             {transcriptions.length > 0 ? (
               <div className="space-y-3">
                 {transcriptions.map((item) => (
-                  <article className="border border-slate-200 bg-slate-50 p-4" key={item.id}>
+                  <article className="transcript-card" key={item.id}>
                     <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="break-words font-semibold text-slate-900">{item.fileName}</p>
+                        <p className="break-words text-base font-semibold leading-6 text-slate-900">{item.fileName}</p>
                         <p className="text-sm text-slate-500">
                           {formatDate(item.createdAt)} | {item.model || 'transcription model'}
                         </p>
@@ -488,7 +488,7 @@ function App() {
                     <div className="mt-4 flex flex-wrap gap-2">
                       <button
                         aria-label="Copy transcription"
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-teal-500 hover:text-teal-700"
+                        className="icon-button"
                         onClick={() => copyTranscript(item.text)}
                         title="Copy transcription"
                         type="button"
@@ -497,7 +497,7 @@ function App() {
                       </button>
                       <button
                         aria-label="Remove transcription"
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-red-300 hover:text-red-700"
+                        className="icon-button hover:border-red-300 hover:text-red-700"
                         onClick={() => removeTranscript(item.id)}
                         title="Remove transcription"
                         type="button"
@@ -509,7 +509,7 @@ function App() {
                 ))}
               </div>
             ) : (
-              <div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+              <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
                 <AudioLines aria-hidden="true" className="mb-3 text-slate-400" size={36} />
                 <p className="font-semibold text-slate-800">No transcriptions yet.</p>
               </div>
