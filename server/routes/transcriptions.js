@@ -124,12 +124,33 @@ router.post('/', handleAudioUpload, async (req, res, next) => {
       : null
 
     const result = await transcribeAudio(req.file.path)
+    const transcriptText = result.text.trim()
+
+    if (!transcriptText) {
+      if (savedTranscription) {
+        savedTranscription.provider = result.provider
+        savedTranscription.model = result.model
+        savedTranscription.status = 'failed'
+        savedTranscription.error = 'No speech was detected in the audio.'
+        await savedTranscription.save()
+      }
+
+      return res.status(422).json({
+        message: 'No speech was detected in the audio. Please try a clearer recording.',
+        saved: Boolean(savedTranscription),
+        transcription: savedTranscription,
+        provider: result.provider,
+        model: result.model,
+        sessionId: uploadDetails.sessionId,
+        file: uploadDetails,
+      })
+    }
 
     if (savedTranscription) {
       savedTranscription.provider = result.provider
       savedTranscription.model = result.model
       savedTranscription.status = 'transcribed'
-      savedTranscription.transcript = result.text
+      savedTranscription.transcript = transcriptText
       savedTranscription.error = ''
       await savedTranscription.save()
     }
@@ -140,7 +161,7 @@ router.post('/', handleAudioUpload, async (req, res, next) => {
         : 'Audio uploaded and transcribed successfully. Add MONGODB_URI to save it in MongoDB.',
       saved: Boolean(savedTranscription),
       transcription: savedTranscription,
-      transcript: result.text,
+      transcript: transcriptText,
       provider: result.provider,
       model: result.model,
       sessionId: uploadDetails.sessionId,

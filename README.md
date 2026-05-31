@@ -74,6 +74,7 @@ The server loads the real `.env` file at runtime. Keep this file local because i
 - **Day 10:** Browser user sessions for saving and retrieving each user's transcription history.
 - **Day 11:** Backend deployment configuration for Render with MongoDB Atlas access.
 - **Day 12:** Frontend deployment configuration for Vercel or Netlify with backend integration.
+- **Day 13:** Final testing and debugging for UI, API validation, transcription, and database health.
 
 ## Day 2: Backend Setup
 
@@ -266,3 +267,18 @@ Final integration check:
 2. Confirm `https://your-render-backend.onrender.com/api/health` returns `{ "ok": true }`.
 3. Upload or record audio from the deployed frontend.
 4. Confirm the transcript appears and saved history refreshes when MongoDB is connected.
+
+## Day 13: Final Testing & Debugging
+
+Final checks cover the main submission risks:
+
+- Production frontend build and ESLint validation.
+- Backend syntax checks for server, routes, models, and transcription service.
+- Live API health check through `GET /api/health`.
+- Database visibility through the `databaseConnected` health response field.
+- Session-scoped history check through `GET /api/transcriptions`.
+- Upload validation for missing files and invalid file types.
+- Local Whisper smoke test through `server/scripts/transcribe_whisper.py`.
+- Empty transcription handling so silent audio does not create blank transcript cards.
+
+If MongoDB is not running locally, `/api/health` reports `databaseConnected: false` and history requests return an empty list with `saved: false`. Transcription can still run, but records are not persisted until MongoDB or MongoDB Atlas is available.

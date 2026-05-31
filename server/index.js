@@ -2,7 +2,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 
-import { connectDatabase } from './config/db.js'
+import { connectDatabase, isDatabaseConnected } from './config/db.js'
 import transcriptionsRouter from './routes/transcriptions.js'
 
 dotenv.config()
@@ -22,7 +22,10 @@ app.use(
 app.use(express.json())
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true })
+  res.json({
+    ok: true,
+    databaseConnected: isDatabaseConnected(),
+  })
 })
 
 app.use('/api/transcriptions', transcriptionsRouter)
